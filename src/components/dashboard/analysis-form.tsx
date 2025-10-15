@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { UploadCloud, Camera, RefreshCcw } from "lucide-react";
+import { UploadCloud, Camera, RefreshCcw, SwitchCamera } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition, useEffect, useRef } from "react";
@@ -26,6 +26,9 @@ export function AnalysisForm() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const { user } = useAuth();
+  
+  const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
+  const [currentDeviceIndex, setCurrentDeviceIndex] = useState(0);
 
   useEffect(() => {
     const category = searchParams.get('category');
@@ -35,34 +38,61 @@ export function AnalysisForm() {
   }, [searchParams]);
 
   useEffect(() => {
-    if (showCamera) {
-      const getCameraPermission = async () => {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-          }
-          setHasCameraPermission(true);
-        } catch (error) {
-          console.error('Error accessing camera:', error);
-          setHasCameraPermission(false);
-          toast({
-            variant: 'destructive',
-            title: 'Camera Access Denied',
-            description: 'Please enable camera permissions in your browser settings.',
-          });
+    let stream: MediaStream | null = null;
+    
+    const cleanup = () => {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
         }
-      };
-      getCameraPermission();
+    };
+    
+    const startCamera = async () => {
+      cleanup(); // Stop any existing stream
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const availableVideoDevices = devices.filter(d => d.kind === 'videoinput');
+        setVideoDevices(availableVideoDevices);
+        
+        if (availableVideoDevices.length === 0) {
+            throw new Error("No video input devices found");
+        }
 
-      return () => {
-        if (videoRef.current && videoRef.current.srcObject) {
-          const stream = videoRef.current.srcObject as MediaStream;
-          stream.getTracks().forEach(track => track.stop());
+        const deviceId = availableVideoDevices[currentDeviceIndex]?.deviceId;
+        const constraints: MediaStreamConstraints = {
+            video: {
+                deviceId: deviceId ? { exact: deviceId } : undefined,
+                // Prioritize rear camera
+                facingMode: deviceId ? undefined : { ideal: 'environment' }
+            }
+        };
+
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+        
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
         }
-      };
+        setHasCameraPermission(true);
+
+      } catch (error) {
+        console.error('Error accessing camera:', error);
+        setHasCameraPermission(false);
+        toast({
+          variant: 'destructive',
+          title: 'Camera Access Denied',
+          description: 'Please enable camera permissions in your browser settings.',
+        });
+      }
+    };
+
+    if (showCamera) {
+      startCamera();
+    } else {
+      cleanup();
     }
-  }, [showCamera, toast]);
+    
+    return cleanup;
+
+  }, [showCamera, currentDeviceIndex, toast]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -106,6 +136,10 @@ export function AnalysisForm() {
     setPreview(null);
     setDataUri("");
     setShowCamera(false);
+  }
+
+  const handleSwitchCamera = () => {
+    setCurrentDeviceIndex(prevIndex => (prevIndex + 1) % videoDevices.length);
   }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -166,7 +200,20 @@ export function AnalysisForm() {
                      </Alert>
                ) : (
                 <>
-                  <video ref={videoRef} className="w-full aspect-video rounded-md" autoPlay muted playsInline />
+                  <div className="relative w-full">
+                     <video ref={videoRef} className="w-full aspect-video rounded-md" autoPlay muted playsInline />
+                     {videoDevices.length > 1 && (
+                       <Button 
+                         type="button" 
+                         size="icon" 
+                         variant="secondary"
+                         className="absolute bottom-2 right-2 rounded-full"
+                         onClick={handleSwitchCamera}
+                       >
+                         <SwitchCamera />
+                       </Button>
+                     )}
+                  </div>
                   <Button type="button" onClick={handleCapture} disabled={isPending}>
                       <Camera className="mr-2" /> Capture Photo
                   </Button>
@@ -253,4 +300,3 @@ export function AnalysisForm() {
       </Button>
     </form>
   );
-}
