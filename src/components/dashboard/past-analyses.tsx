@@ -12,7 +12,7 @@ const demoAnalyses: AnalysisResult[] = [
     {
         id: 'demo-1',
         userId: 'anonymous-user',
-        imageUrl: 'https://images.unsplash.com/photo-15981640 práctico-corn-field-with-a-disease-on-leaves-35c2a0753d0e?q=80&w=600',
+        imageUrl: 'https://images.unsplash.com/photo-1598164013233-0252e753d0e9?q=80&w=600',
         analysisResult: 'Maize Streak Virus Detected',
         confidenceLevel: 0.92,
         suggestedActions: 'Control leafhopper vectors. Remove and destroy infected plants. Plant resistant varieties in the next season.',
