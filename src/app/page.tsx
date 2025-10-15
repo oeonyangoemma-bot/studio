@@ -75,12 +75,12 @@ export default function Home() {
             </div>
             <div className="mt-16 grid grid-cols-3 gap-8 max-w-2xl mx-auto pb-16">
               {analysisIcons.map((item) => (
-                <div key={item.name} className="flex flex-col items-center gap-2">
-                  <div className="p-4 bg-background/20 rounded-full backdrop-blur-sm">
+                <Link key={item.name} href={`/dashboard/analysis?category=${item.name}`} className="flex flex-col items-center gap-2 group">
+                  <div className="p-4 bg-background/20 rounded-full backdrop-blur-sm group-hover:bg-background/30 transition-colors">
                     {item.icon}
                   </div>
                   <span className="font-semibold">{item.name}</span>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

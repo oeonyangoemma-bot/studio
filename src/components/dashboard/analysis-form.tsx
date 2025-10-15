@@ -8,15 +8,24 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { UploadCloud } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useTransition, useEffect } from "react";
 
 export function AnalysisForm() {
   const [preview, setPreview] = useState<string | null>(null);
   const [dataUri, setDataUri] = useState<string>("");
+  const [details, setDetails] = useState("");
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const category = searchParams.get('category');
+    if (category) {
+      setDetails(`Checking for potential ${category.toLowerCase()}.`);
+    }
+  }, [searchParams]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -101,6 +110,8 @@ export function AnalysisForm() {
           id="additionalDetails"
           name="additionalDetails"
           placeholder="e.g., 'Corn plant, 2 weeks old, leaves are yellowing'"
+          value={details}
+          onChange={(e) => setDetails(e.target.value)}
           disabled={isPending}
         />
       </div>
