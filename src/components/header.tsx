@@ -1,5 +1,6 @@
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { UserNav } from "./user-nav";
+import { AuthProvider } from "./auth-provider";
 
 export function Header() {
   return (
@@ -9,7 +10,9 @@ export function Header() {
        </div>
        <div className="flex-1" />
        <div>
-         <UserNav />
+        <AuthProvider>
+          <UserNav />
+        </AuthProvider>
        </div>
     </header>
   )

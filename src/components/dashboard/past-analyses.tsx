@@ -19,7 +19,7 @@ export function PastAnalyses() {
 
     useEffect(() => {
         if (!user) {
-            if (!authLoading) setLoading(false);
+            setLoading(false);
             return;
         };
 
@@ -59,6 +59,18 @@ export function PastAnalyses() {
                         <Skeleton className="h-4 w-1/2" />
                     </div>
                 ))}
+            </div>
+        )
+    }
+
+    if (!user) {
+        return (
+             <div className="text-center py-16 border-2 border-dashed rounded-lg">
+                <h3 className="text-xl font-semibold">Login to View Past Analyses</h3>
+                <p className="text-muted-foreground mt-2">Create an account to save and review your analysis history.</p>
+                <Button asChild className="mt-4">
+                    <Link href="/signup">Create an Account</Link>
+                </Button>
             </div>
         )
     }

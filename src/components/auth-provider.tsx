@@ -16,7 +16,6 @@ const AuthContext = createContext<AuthContextType>({ user: null, loading: true }
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const pathname = usePathname();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -27,13 +26,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => unsubscribe();
   }, []);
 
-  const isPublicPage = ['/login', '/signup', '/'].includes(pathname);
-  const isChatbotPage = pathname.startsWith('/dashboard/chatbot');
-
-  if(loading && !isPublicPage && !isChatbotPage) {
-    return <AuthLoader />;
-  }
-
   return (
     <AuthContext.Provider value={{ user, loading }}>
       {children}
@@ -41,7 +33,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (context === undefined) {
+        // This is the case for anonymous users
+        return { user: null, loading: false };
+    }
+    return context;
+};
 
 
 const AuthLoader = () => (

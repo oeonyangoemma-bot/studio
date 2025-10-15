@@ -153,18 +153,11 @@ export function AnalysisForm() {
       return;
     }
 
-    if (!user) {
-      toast({
-        variant: 'destructive',
-        title: 'Not Authenticated',
-        description: 'You must be logged in to perform an analysis.',
-      });
-      return;
-    }
+    const userId = user?.uid || 'anonymous-user';
 
     const formData = new FormData(event.currentTarget);
     formData.append('mediaDataUri', dataUri);
-    formData.append('userId', user.uid);
+    formData.append('userId', userId);
 
     startTransition(async () => {
       const result = await performAnalysis(formData);

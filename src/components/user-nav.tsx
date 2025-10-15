@@ -2,6 +2,7 @@
 
 import { signOut } from "firebase/auth"
 import { auth } from "@/lib/firebase"
+import Link from "next/link";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -15,19 +16,33 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useAuth } from "./auth-provider"
-import { LogOut, User as UserIcon } from "lucide-react"
+import { LogIn, LogOut, User as UserIcon } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export function UserNav() {
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
     const router = useRouter();
 
     const handleLogout = async () => {
         await signOut(auth);
-        router.push('/login');
+        router.push('/');
+    }
+
+    if (loading) {
+      return null; // Or a loading skeleton
     }
 
     if (!user) {
-        return null;
+        return (
+            <div className="flex items-center gap-2">
+                 <Button asChild variant="ghost">
+                    <Link href="/login">Login</Link>
+                </Button>
+                <Button asChild>
+                    <Link href="/signup">Sign Up</Link>
+                </Button>
+            </div>
+        )
     }
 
     const initial = user.email ? user.email.charAt(0).toUpperCase() : <UserIcon />;
@@ -72,5 +87,3 @@ export function UserNav() {
     </DropdownMenu>
   )
 }
-
-import { useRouter } from "next/navigation"
