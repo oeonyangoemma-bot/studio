@@ -12,7 +12,7 @@ const demoAnalyses: AnalysisResult[] = [
     {
         id: 'demo-1',
         userId: 'anonymous-user',
-        imageUrl: 'https://picsum.photos/seed/corn-disease-uganda/600/400',
+        imageUrl: 'https://images.unsplash.com/photo-15981640 práctico-corn-field-with-a-disease-on-leaves-35c2a0753d0e?q=80&w=600',
         analysisResult: 'Maize Streak Virus Detected',
         confidenceLevel: 0.92,
         suggestedActions: 'Control leafhopper vectors. Remove and destroy infected plants. Plant resistant varieties in the next season.',
@@ -22,7 +22,7 @@ const demoAnalyses: AnalysisResult[] = [
     {
         id: 'demo-2',
         userId: 'anonymous-user',
-        imageUrl: 'https://picsum.photos/seed/banana-uganda/600/400',
+        imageUrl: 'https://images.unsplash.com/photo-1543363363-67503462612f?q=80&w=600',
         analysisResult: 'Black Sigatoka on Banana Plant',
         confidenceLevel: 0.88,
         suggestedActions: 'Prune affected leaves to reduce inoculum. Apply appropriate systemic fungicides. Ensure good drainage.',
@@ -31,7 +31,7 @@ const demoAnalyses: AnalysisResult[] = [
     {
         id: 'demo-3',
         userId: 'anonymous-user',
-        imageUrl: 'https://picsum.photos/seed/healthy-cassava/600/400',
+        imageUrl: 'https://images.unsplash.com/photo-1625246303324-4c869115b533?q=80&w=600',
         analysisResult: 'Healthy Cassava Crop',
         confidenceLevel: 0.98,
         suggestedActions: 'Maintain current weeding and pest management schedule. Monitor for signs of mosaic virus.',
@@ -41,7 +41,7 @@ const demoAnalyses: AnalysisResult[] = [
     {
         id: 'demo-4',
         userId: 'anonymous-user',
-        imageUrl: 'https://picsum.photos/seed/coffee-rust-uganda/600/400',
+        imageUrl: 'https://images.unsplash.com/photo-1447933601403-7c1808d54afd?q=80&w=600',
         analysisResult: 'Coffee Leaf Rust Detected',
         confidenceLevel: 0.95,
         suggestedActions: 'Apply copper-based fungicides. Prune trees for better air circulation. Use resistant cultivars where possible.',

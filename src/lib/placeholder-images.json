@@ -3,31 +3,31 @@
     {
       "id": "landing-hero",
       "description": "A vibrant green farm field in Uganda under a sunny sky",
-      "imageUrl": "https://picsum.photos/seed/uganda-farm/1920/1080",
+      "imageUrl": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1920",
       "imageHint": "ugandan farm"
     },
     {
       "id": "feature-analysis",
       "description": "A close-up of a coffee plant leaf being inspected",
-      "imageUrl": "https://picsum.photos/seed/coffee-leaf/600/400",
+      "imageUrl": "https://images.unsplash.com/photo-1621947231435-51745d19a4a7?q=80&w=600",
       "imageHint": "coffee plant"
     },
     {
       "id": "feature-chatbot",
       "description": "A Ugandan farmer using a smartphone in a banana plantation",
-      "imageUrl": "https://picsum.photos/seed/ugandan-farmer/600/400",
+      "imageUrl": "https://images.unsplash.com/photo-1581359160527-9ecd0025a7a4?q=80&w=600",
       "imageHint": "ugandan farmer"
     },
     {
       "id": "feature-dashboard",
       "description": "A clean and modern dashboard interface showing agricultural data",
-      "imageUrl": "https://picsum.photos/seed/agri-dashboard/600/400",
+      "imageUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=600",
       "imageHint": "dashboard charts"
     },
     {
       "id": "analysis-placeholder",
       "description": "A placeholder image for a banana plant analysis",
-      "imageUrl": "https://picsum.photos/seed/banana-plant/300/200",
+      "imageUrl": "https://images.unsplash.com/photo-1543363363-67503462612f?q=80&w=300",
       "imageHint": "banana plant"
     }
   ]
