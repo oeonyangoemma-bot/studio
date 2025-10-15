@@ -108,6 +108,6 @@ const chatbotAgriculturalAdviceFlow = ai.defineFlow(
         system: systemPrompt,
     });
     
-    return { advice: llmResponse.text() };
+    return { advice: llmResponse.text };
   }
 );
