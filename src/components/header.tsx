@@ -7,7 +7,7 @@ export function Header() {
          <SidebarTrigger />
        </div>
        <div className="flex-1" />
-       <div className="hidden md:block">
+       <div>
          {/* UserNav was here */}
        </div>
     </header>

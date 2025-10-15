@@ -21,8 +21,6 @@ export function PastAnalyses() {
     const userId = "anonymous-user";
 
     useEffect(() => {
-        if (!userId) return;
-
         const fetchAnalyses = async () => {
             try {
                 const q = query(

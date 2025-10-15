@@ -25,15 +25,6 @@ export async function askQuestion(input: ChatbotAgriculturalAdviceInput): Promis
   return chatbotAgriculturalAdviceFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'chatbotAgriculturalAdvicePrompt',
-  input: {schema: ChatbotAgriculturalAdviceInputSchema},
-  output: {schema: ChatbotAgriculturalAdviceOutputSchema},
-  prompt: `You are an AI-powered agricultural advisor. A farmer will ask you a question, and you will provide helpful and practical advice.
-
-Question: {{{question}}}`,
-});
-
 const chatbotAgriculturalAdviceFlow = ai.defineFlow(
   {
     name: 'chatbotAgriculturalAdviceFlow',
@@ -41,9 +32,19 @@ const chatbotAgriculturalAdviceFlow = ai.defineFlow(
     outputSchema: ChatbotAgriculturalAdviceOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const llmResponse = await ai.generate({
+      prompt: `You are an AI-powered agricultural advisor. A farmer will ask you a question, and you will provide helpful and practical advice.
+
+Question: ${input.question}`,
+      model: 'googleai/gemini-2.5-flash',
+      output: {
+        schema: ChatbotAgriculturalAdviceOutputSchema,
+      },
+    });
+
+    const output = llmResponse.output();
     if (!output) {
-      throw new Error('No output from prompt');
+      throw new Error('No output from language model');
     }
     return output;
   }
