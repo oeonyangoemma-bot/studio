@@ -2,27 +2,27 @@
   "placeholderImages": [
     {
       "id": "landing-hero",
-      "description": "A vibrant green farm field in Uganda under a sunny sky",
-      "imageUrl": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1920",
-      "imageHint": "ugandan farm"
+      "description": "A drone flying over a lush green agricultural field, representing modern farming technology.",
+      "imageUrl": "https://images.unsplash.com/photo-1601269986382-3c5b8b1b0b0a?q=80&w=1920",
+      "imageHint": "farm drone"
     },
     {
       "id": "feature-analysis",
-      "description": "A close-up of a coffee plant leaf being inspected",
-      "imageUrl": "https://images.unsplash.com/photo-1621947231435-51745d19a4a7?q=80&w=600",
-      "imageHint": "coffee plant"
+      "description": "A person using a magnifying glass to inspect a plant leaf, symbolizing crop analysis.",
+      "imageUrl": "https://images.unsplash.com/photo-1615152528913-74768b53e334?q=80&w=600",
+      "imageHint": "plant inspection"
     },
     {
       "id": "feature-chatbot",
-      "description": "A Ugandan farmer using a smartphone in a banana plantation",
-      "imageUrl": "https://images.unsplash.com/photo-1581359160527-9ecd0025a7a4?q=80&w=600",
-      "imageHint": "ugandan farmer"
+      "description": "A farmer in a field holding a smartphone, representing access to digital advice.",
+      "imageUrl": "https://images.unsplash.com/photo-1560493676-04071c5f467b?q=80&w=600",
+      "imageHint": "farmer smartphone"
     },
     {
       "id": "feature-dashboard",
-      "description": "A clean and modern dashboard interface showing agricultural data",
-      "imageUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=600",
-      "imageHint": "dashboard charts"
+      "description": "A tablet displaying charts and graphs over a background of a greenhouse.",
+      "imageUrl": "https://images.unsplash.com/photo-1630563443362-b9241a7d6569?q=80&w=600",
+      "imageHint": "farm data"
     },
     {
       "id": "analysis-placeholder",
