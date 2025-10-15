@@ -2,33 +2,33 @@
   "placeholderImages": [
     {
       "id": "landing-hero",
-      "description": "A vibrant green farm field under a sunny sky",
-      "imageUrl": "https://picsum.photos/seed/farm/1920/1080",
-      "imageHint": "farm field"
+      "description": "A vibrant green farm field in Uganda under a sunny sky",
+      "imageUrl": "https://picsum.photos/seed/uganda-farm/1920/1080",
+      "imageHint": "ugandan farm"
     },
     {
       "id": "feature-analysis",
-      "description": "A close-up of a plant leaf being inspected with a magnifying glass",
-      "imageUrl": "https://picsum.photos/seed/leaf/600/400",
-      "imageHint": "plant leaf"
+      "description": "A close-up of a coffee plant leaf being inspected",
+      "imageUrl": "https://picsum.photos/seed/coffee-leaf/600/400",
+      "imageHint": "coffee plant"
     },
     {
       "id": "feature-chatbot",
-      "description": "A person using a smartphone in a field, with chat bubbles overlaid",
-      "imageUrl": "https://picsum.photos/seed/chatbot/600/400",
-      "imageHint": "smartphone field"
+      "description": "A Ugandan farmer using a smartphone in a banana plantation",
+      "imageUrl": "https://picsum.photos/seed/ugandan-farmer/600/400",
+      "imageHint": "ugandan farmer"
     },
     {
       "id": "feature-dashboard",
-      "description": "A clean and modern dashboard interface showing charts and graphs",
-      "imageUrl": "https://picsum.photos/seed/dashboard/600/400",
+      "description": "A clean and modern dashboard interface showing agricultural data",
+      "imageUrl": "https://picsum.photos/seed/agri-dashboard/600/400",
       "imageHint": "dashboard charts"
     },
     {
       "id": "analysis-placeholder",
-      "description": "A placeholder image for a crop analysis card",
-      "imageUrl": "https://picsum.photos/seed/crop/300/200",
-      "imageHint": "crop"
+      "description": "A placeholder image for a banana plant analysis",
+      "imageUrl": "https://picsum.photos/seed/banana-plant/300/200",
+      "imageHint": "banana plant"
     }
   ]
 }

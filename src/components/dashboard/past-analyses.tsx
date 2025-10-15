@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,39 +12,39 @@ const demoAnalyses: AnalysisResult[] = [
     {
         id: 'demo-1',
         userId: 'anonymous-user',
-        imageUrl: 'https://picsum.photos/seed/corn-rust/600/400',
-        analysisResult: 'Common Rust Detected on Corn',
+        imageUrl: 'https://picsum.photos/seed/corn-disease-uganda/600/400',
+        analysisResult: 'Maize Streak Virus Detected',
         confidenceLevel: 0.92,
-        suggestedActions: 'Apply a recommended fungicide. Consider crop rotation for next season. Monitor nearby plants for spread.',
+        suggestedActions: 'Control leafhopper vectors. Remove and destroy infected plants. Plant resistant varieties in the next season.',
         createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-        additionalDetails: 'Leaves showing small, cinnamon-brown pustules.'
+        additionalDetails: 'Corn (maize) leaves showing characteristic streaking.'
     },
     {
         id: 'demo-2',
         userId: 'anonymous-user',
-        imageUrl: 'https://picsum.photos/seed/tomato-blight/600/400',
-        analysisResult: 'Early Blight on Tomato Plant',
+        imageUrl: 'https://picsum.photos/seed/banana-uganda/600/400',
+        analysisResult: 'Black Sigatoka on Banana Plant',
         confidenceLevel: 0.88,
-        suggestedActions: 'Prune affected lower leaves. Ensure proper spacing for air circulation. Use a copper-based fungicide if severe.',
+        suggestedActions: 'Prune affected leaves to reduce inoculum. Apply appropriate systemic fungicides. Ensure good drainage.',
         createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
     },
     {
         id: 'demo-3',
         userId: 'anonymous-user',
-        imageUrl: 'https://picsum.photos/seed/healthy-wheat/600/400',
-        analysisResult: 'Healthy Wheat Crop',
+        imageUrl: 'https://picsum.photos/seed/healthy-cassava/600/400',
+        analysisResult: 'Healthy Cassava Crop',
         confidenceLevel: 0.98,
-        suggestedActions: 'Maintain current irrigation and nutrient schedule. Continue to monitor for pests weekly.',
+        suggestedActions: 'Maintain current weeding and pest management schedule. Monitor for signs of mosaic virus.',
         createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
-        additionalDetails: 'Crop appears vibrant and green. No visible signs of stress.'
+        additionalDetails: 'Crop appears vigorous. No visible signs of leaf discoloration.'
     },
     {
         id: 'demo-4',
         userId: 'anonymous-user',
-        imageUrl: 'https://picsum.photos/seed/aphids-lettuce/600/400',
-        analysisResult: 'Aphid Infestation on Lettuce',
+        imageUrl: 'https://picsum.photos/seed/coffee-rust-uganda/600/400',
+        analysisResult: 'Coffee Leaf Rust Detected',
         confidenceLevel: 0.95,
-        suggestedActions: 'Introduce beneficial insects like ladybugs. Apply insecticidal soap or neem oil. Spray with a strong stream of water.',
+        suggestedActions: 'Apply copper-based fungicides. Prune trees for better air circulation. Use resistant cultivars where possible.',
         createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 1 week ago
     }
 ];
