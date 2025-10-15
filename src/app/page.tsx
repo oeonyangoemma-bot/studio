@@ -8,22 +8,28 @@ import { Logo } from '@/components/logo';
 
 const features = [
   {
+    id: 'analysis',
     icon: <Presentation className="w-8 h-8 text-primary" />,
     title: 'AI-Powered Analysis',
     description: 'Upload images or video frames of your crops to get instant analysis on diseases, pests, and soil health.',
     image: PlaceHolderImages.find(p => p.id === 'feature-analysis'),
+    href: '/dashboard/analysis',
   },
   {
+    id: 'chatbot',
     icon: <Bot className="w-8 h-8 text-primary" />,
     title: 'Expert Chatbot',
     description: 'Ask our AI-powered chatbot any agricultural question and get immediate, expert advice.',
     image: PlaceHolderImages.find(p => p.id === 'feature-chatbot'),
+    href: '/dashboard/chatbot',
   },
   {
+    id: 'dashboard',
     icon: <Leaf className="w-8 h-8 text-primary" />,
     title: 'Personalized Dashboard',
     description: 'Track your submission history, view detailed reports, and monitor your farm\'s health over time.',
     image: PlaceHolderImages.find(p => p.id === 'feature-dashboard'),
+    href: '/dashboard',
   },
 ];
 
@@ -103,28 +109,30 @@ export default function Home() {
             </div>
             <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:gap-12 mt-12">
               {features.map((feature) => (
-                <Card key={feature.title} className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
-                  {feature.image && (
-                    <div className="aspect-video relative">
-                      <Image
-                        src={feature.image.imageUrl}
-                        alt={feature.image.description}
-                        fill
-                        className="object-cover"
-                        data-ai-hint={feature.image.imageHint}
-                      />
-                    </div>
-                  )}
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-3">
-                      {feature.icon}
-                      {feature.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">{feature.description}</p>
-                  </CardContent>
-                </Card>
+                <Link key={feature.title} href={feature.href} className="flex">
+                  <Card className="w-full overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
+                    {feature.image && (
+                      <div className="aspect-video relative">
+                        <Image
+                          src={feature.image.imageUrl}
+                          alt={feature.image.description}
+                          fill
+                          className="object-cover"
+                          data-ai-hint={feature.image.imageHint}
+                        />
+                      </div>
+                    )}
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-3">
+                        {feature.icon}
+                        {feature.title}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex-1">
+                      <p className="text-muted-foreground">{feature.description}</p>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
           </div>
