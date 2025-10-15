@@ -6,17 +6,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { UploadCloud } from "lucide-react";
+import { UploadCloud, Camera, RefreshCcw } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 import { useAuth } from "../auth-provider";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 
 export function AnalysisForm() {
   const [preview, setPreview] = useState<string | null>(null);
   const [dataUri, setDataUri] = useState<string>("");
   const [details, setDetails] = useState("");
   const [isPending, startTransition] = useTransition();
+  const [showCamera, setShowCamera] = useState(false);
+  const [hasCameraPermission, setHasCameraPermission] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -28,6 +33,36 @@ export function AnalysisForm() {
       setDetails(`Checking for potential ${category.toLowerCase()}.`);
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    if (showCamera) {
+      const getCameraPermission = async () => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
+          setHasCameraPermission(true);
+        } catch (error) {
+          console.error('Error accessing camera:', error);
+          setHasCameraPermission(false);
+          toast({
+            variant: 'destructive',
+            title: 'Camera Access Denied',
+            description: 'Please enable camera permissions in your browser settings.',
+          });
+        }
+      };
+      getCameraPermission();
+
+      return () => {
+        if (videoRef.current && videoRef.current.srcObject) {
+          const stream = videoRef.current.srcObject as MediaStream;
+          stream.getTracks().forEach(track => track.stop());
+        }
+      };
+    }
+  }, [showCamera, toast]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -44,10 +79,34 @@ export function AnalysisForm() {
       reader.onloadend = () => {
         setPreview(reader.result as string);
         setDataUri(reader.result as string);
+        setShowCamera(false);
       };
       reader.readAsDataURL(file);
     }
   };
+
+  const handleCapture = () => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const context = canvas.getContext('2d');
+      if (context) {
+        context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+        const capturedDataUri = canvas.toDataURL('image/jpeg');
+        setDataUri(capturedDataUri);
+        setPreview(capturedDataUri);
+        setShowCamera(false);
+      }
+    }
+  };
+  
+  const resetForm = () => {
+    setPreview(null);
+    setDataUri("");
+    setShowCamera(false);
+  }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -95,26 +154,87 @@ export function AnalysisForm() {
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
         <Label htmlFor="crop-image">Crop Image</Label>
-        <div className="w-full h-64 border-2 border-dashed border-muted-foreground/50 rounded-lg flex items-center justify-center relative overflow-hidden">
-          {preview ? (
-            <Image src={preview} alt="Crop preview" fill className="object-contain" />
-          ) : (
-            <div className="text-center text-muted-foreground">
-              <UploadCloud className="mx-auto h-12 w-12" />
-              <p>Click to browse or drag & drop</p>
-              <p className="text-xs">PNG, JPG, WEBP up to 4MB</p>
+        
+        {showCamera ? (
+            <div className="w-full h-auto border-2 border-dashed border-muted-foreground/50 rounded-lg flex flex-col items-center justify-center relative overflow-hidden p-4 space-y-4">
+               {!hasCameraPermission ? (
+                     <Alert variant="destructive">
+                       <AlertTitle>Camera Access Denied</AlertTitle>
+                       <AlertDescription>
+                         Please enable camera permissions in your browser settings and try again.
+                       </AlertDescription>
+                     </Alert>
+               ) : (
+                <>
+                  <video ref={videoRef} className="w-full aspect-video rounded-md" autoPlay muted playsInline />
+                  <Button type="button" onClick={handleCapture} disabled={isPending}>
+                      <Camera className="mr-2" /> Capture Photo
+                  </Button>
+                </>
+               )}
             </div>
-          )}
-          <Input
-            id="crop-image"
-            type="file"
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            onChange={handleFileChange}
-            accept="image/png, image/jpeg, image/webp"
-            disabled={isPending}
-          />
-        </div>
+        ) : (
+          <div className="w-full h-64 border-2 border-dashed border-muted-foreground/50 rounded-lg flex items-center justify-center relative overflow-hidden">
+            {preview ? (
+              <Image src={preview} alt="Crop preview" fill className="object-contain" />
+            ) : (
+              <div className="text-center text-muted-foreground">
+                <UploadCloud className="mx-auto h-12 w-12" />
+                <p>Click to browse or drag & drop</p>
+                <p className="text-xs">PNG, JPG, WEBP up to 4MB</p>
+              </div>
+            )}
+            <Input
+              id="crop-image"
+              type="file"
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              onChange={handleFileChange}
+              accept="image/png, image/jpeg, image/webp"
+              disabled={isPending}
+            />
+          </div>
+        )}
       </div>
+
+      {!preview && !showCamera && (
+         <div className="relative flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">Or</span>
+            </div>
+        </div>
+      )}
+
+
+      <div className="flex flex-col sm:flex-row gap-2">
+       {!preview && (
+        <Button 
+            type="button" 
+            variant="outline" 
+            className="w-full" 
+            onClick={() => setShowCamera(!showCamera)} 
+            disabled={isPending}
+        >
+            <Camera className="mr-2" /> {showCamera ? 'Close Camera' : 'Use Camera'}
+        </Button>
+       )}
+       {preview && (
+        <Button 
+            type="button" 
+            variant="outline" 
+            className="w-full" 
+            onClick={resetForm} 
+            disabled={isPending}
+        >
+            <RefreshCcw className="mr-2" /> Retake / Re-upload
+        </Button>
+       )}
+      </div>
+      
+      <canvas ref={canvasRef} className="hidden"></canvas>
+
 
       <div className="space-y-2">
         <Label htmlFor="additionalDetails">Additional Details (Optional)</Label>
