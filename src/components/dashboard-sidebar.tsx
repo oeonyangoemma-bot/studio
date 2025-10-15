@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
 import { Logo } from './logo';
-import { UserNav } from './user-nav';
 
 
 const navItems = [
@@ -36,7 +35,7 @@ export function DashboardSidebar() {
             <Link href={item.href} legacyBehavior passHref>
               <SidebarMenuButton
                 asChild
-                isActive={pathname === item.href}
+                isActive={pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))}
                 tooltip={item.label}
               >
                 <a>
@@ -49,7 +48,6 @@ export function DashboardSidebar() {
         ))}
       </SidebarMenu>
       <SidebarFooter>
-        <UserNav />
       </SidebarFooter>
     </Sidebar>
   );

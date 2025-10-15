@@ -2,7 +2,7 @@
 
 import { analyzeCropHealth } from "@/ai/flows/ai-analysis-crop-health";
 import { askQuestion } from "@/ai/flows/chatbot-agricultural-advice";
-import { auth, db, storage } from "@/lib/firebase";
+import { db, storage } from "@/lib/firebase";
 import { AnalysisResult } from "@/lib/types";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
@@ -31,11 +31,9 @@ export async function performAnalysis(formData: FormData) {
     }
     
     const { mediaDataUri, additionalDetails } = validatedFields.data;
-
-    const user = auth.currentUser;
-    if (!user) {
-        throw new Error("You must be logged in to perform an analysis.");
-    }
+    
+    // Using a mock user ID
+    const userId = "anonymous-user";
     
     try {
         const [analysisResult, imageUrl] = await Promise.all([
@@ -43,12 +41,12 @@ export async function performAnalysis(formData: FormData) {
                 mediaDataUri,
                 additionalDetails,
             }),
-            uploadImageAndGetUrl(mediaDataUri, user.uid),
+            uploadImageAndGetUrl(mediaDataUri, userId),
         ]);
 
 
         const docRef = await addDoc(collection(db, "analyses"), {
-            userId: user.uid,
+            userId: userId,
             imageUrl,
             additionalDetails,
             ...analysisResult,

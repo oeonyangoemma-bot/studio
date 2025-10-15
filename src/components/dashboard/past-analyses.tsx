@@ -1,9 +1,7 @@
 'use client';
 
-import { useAuth } from "@/components/auth-provider";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { db } from "@/lib/firebase";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { AnalysisResult } from "@/lib/types";
 import { collection, query, where, getDocs, orderBy, limit } from "firebase/firestore";
 import { formatDistanceToNow } from "date-fns";
@@ -15,19 +13,21 @@ import { Skeleton } from "../ui/skeleton";
 import { AlertCircle } from "lucide-react";
 
 export function PastAnalyses() {
-    const { user } = useAuth();
     const [analyses, setAnalyses] = useState<AnalysisResult[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    // Using a mock user ID
+    const userId = "anonymous-user";
+
     useEffect(() => {
-        if (!user) return;
+        if (!userId) return;
 
         const fetchAnalyses = async () => {
             try {
                 const q = query(
                     collection(db, "analyses"), 
-                    where("userId", "==", user.uid),
+                    where("userId", "==", userId),
                     orderBy("createdAt", "desc"),
                     limit(12)
                 );
@@ -51,7 +51,7 @@ export function PastAnalyses() {
         };
 
         fetchAnalyses();
-    }, [user]);
+    }, [userId]);
 
     if (loading) {
         return (

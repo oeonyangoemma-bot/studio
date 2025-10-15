@@ -41,11 +41,8 @@ export default function Home() {
       <header className="px-4 lg:px-6 h-16 flex items-center bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <Logo />
         <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Button variant="ghost" asChild>
-            <Link href="/login">Login</Link>
-          </Button>
           <Button asChild>
-            <Link href="/signup">Sign Up</Link>
+            <Link href="/dashboard">Go to Dashboard</Link>
           </Button>
         </nav>
       </header>
@@ -72,7 +69,7 @@ export default function Home() {
               </p>
               <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center">
                 <Button size="lg" asChild>
-                  <Link href="/signup">Get Started for Free</Link>
+                  <Link href="/dashboard">Get Started for Free</Link>
                 </Button>
               </div>
             </div>
@@ -145,7 +142,7 @@ export default function Home() {
             </div>
             <div className="mx-auto w-full max-w-sm space-x-2">
               <Button asChild size="lg">
-                <Link href="/signup">Sign Up Now</Link>
+                <Link href="/dashboard">Try the Dashboard</Link>
               </Button>
             </div>
           </div>
