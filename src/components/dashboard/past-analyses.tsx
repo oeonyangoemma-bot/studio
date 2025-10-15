@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,52 +6,62 @@ import { formatDistanceToNow } from "date-fns";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "../ui/button";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
-
-const demoAnalyses: AnalysisResult[] = [
-    {
-        id: 'demo-1',
-        userId: 'anonymous-user',
-        imageUrl: PlaceHolderImages.find(p => p.id === 'feature-analysis')?.imageUrl || 'https://picsum.photos/seed/demo1/600/400',
-        analysisResult: 'Maize Streak Virus Detected',
-        confidenceLevel: 0.92,
-        suggestedActions: 'Control leafhopper vectors. Remove and destroy infected plants. Plant resistant varieties in the next season.',
-        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-        additionalDetails: 'Corn (maize) leaves showing characteristic streaking.'
-    },
-    {
-        id: 'demo-2',
-        userId: 'anonymous-user',
-        imageUrl: PlaceHolderImages.find(p => p.id === 'analysis-placeholder')?.imageUrl || 'https://picsum.photos/seed/demo2/600/400',
-        analysisResult: 'Black Sigatoka on Banana Plant',
-        confidenceLevel: 0.88,
-        suggestedActions: 'Prune affected leaves to reduce inoculum. Apply appropriate systemic fungicides. Ensure good drainage.',
-        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
-    },
-    {
-        id: 'demo-3',
-        userId: 'anonymous-user',
-        imageUrl: PlaceHolderImages.find(p => p.id === 'feature-dashboard')?.imageUrl || 'https://picsum.photos/seed/demo3/600/400',
-        analysisResult: 'Healthy Cassava Crop',
-        confidenceLevel: 0.98,
-        suggestedActions: 'Maintain current weeding and pest management schedule. Monitor for signs of mosaic virus.',
-        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
-        additionalDetails: 'Crop appears vigorous. No visible signs of leaf discoloration.'
-    },
-    {
-        id: 'demo-4',
-        userId: 'anonymous-user',
-        imageUrl: 'https://images.unsplash.com/photo-1447933601403-7c1808d54afd?q=80&w=600&auto=format&fit=crop',
-        analysisResult: 'Coffee Leaf Rust Detected',
-        confidenceLevel: 0.95,
-        suggestedActions: 'Apply copper-based fungicides. Prune trees for better air circulation. Use resistant cultivars where possible.',
-        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 1 week ago
-    }
-];
-
+import { useAuth } from "../auth-provider";
+import { useEffect, useState } from "react";
+import { collection, query, where, onSnapshot, orderBy } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { Skeleton } from "../ui/skeleton";
 
 export function PastAnalyses() {
-    const analyses = demoAnalyses;
+    const { user, loading: authLoading } = useAuth();
+    const [analyses, setAnalyses] = useState<AnalysisResult[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (!user) {
+            if (!authLoading) setLoading(false);
+            return;
+        };
+
+        const q = query(
+            collection(db, "analyses"),
+            where("userId", "==", user.uid),
+            orderBy("createdAt", "desc")
+        );
+
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            const fetchedAnalyses: AnalysisResult[] = [];
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                fetchedAnalyses.push({
+                    id: doc.id,
+                    ...data,
+                    createdAt: data.createdAt.toDate(),
+                } as AnalysisResult);
+            });
+            setAnalyses(fetchedAnalyses);
+            setLoading(false);
+        }, (error) => {
+            console.error("Error fetching analyses:", error);
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
+    }, [user, authLoading]);
+
+    if (loading || authLoading) {
+        return (
+             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                   <div key={i} className="space-y-3">
+                        <Skeleton className="h-40 w-full" />
+                        <Skeleton className="h-6 w-3/4" />
+                        <Skeleton className="h-4 w-1/2" />
+                    </div>
+                ))}
+            </div>
+        )
+    }
 
     if (analyses.length === 0) {
         return (

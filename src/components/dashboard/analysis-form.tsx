@@ -10,6 +10,7 @@ import { UploadCloud } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition, useEffect } from "react";
+import { useAuth } from "../auth-provider";
 
 export function AnalysisForm() {
   const [preview, setPreview] = useState<string | null>(null);
@@ -19,6 +20,7 @@ export function AnalysisForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   useEffect(() => {
     const category = searchParams.get('category');
@@ -58,8 +60,18 @@ export function AnalysisForm() {
       return;
     }
 
+    if (!user) {
+      toast({
+        variant: 'destructive',
+        title: 'Not Authenticated',
+        description: 'You must be logged in to perform an analysis.',
+      });
+      return;
+    }
+
     const formData = new FormData(event.currentTarget);
     formData.append('mediaDataUri', dataUri);
+    formData.append('userId', user.uid);
 
     startTransition(async () => {
       const result = await performAnalysis(formData);

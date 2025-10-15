@@ -2,7 +2,7 @@
 
 import { analyzeCropHealth } from "@/ai/flows/ai-analysis-crop-health";
 import { askQuestion } from "@/ai/flows/chatbot-agricultural-advice";
-import { db, storage } from "@/lib/firebase";
+import { auth, db, storage } from "@/lib/firebase";
 import { AnalysisResult } from "@/lib/types";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
@@ -14,12 +14,14 @@ const analysisSchema = z.object({
         message: 'Must be a data URI for an image.',
     }),
     additionalDetails: z.string().optional(),
+    userId: z.string(),
 });
 
 export async function performAnalysis(formData: FormData) {
     const rawData = {
         mediaDataUri: formData.get('mediaDataUri'),
-        additionalDetails: formData.get('additionalDetails')
+        additionalDetails: formData.get('additionalDetails'),
+        userId: formData.get('userId'),
     };
 
     const validatedFields = analysisSchema.safeParse(rawData);
@@ -30,10 +32,11 @@ export async function performAnalysis(formData: FormData) {
         };
     }
     
-    const { mediaDataUri, additionalDetails } = validatedFields.data;
+    const { mediaDataUri, additionalDetails, userId } = validatedFields.data;
     
-    // Using a mock user ID
-    const userId = "anonymous-user";
+    if (!userId) {
+      return { error: "User not authenticated." };
+    }
     
     try {
         const [analysisResult, imageUrl] = await Promise.all([
@@ -89,9 +92,9 @@ export async function getAnalysisResult(id: string): Promise<AnalysisResult | nu
 }
 
 
-export async function askChatbot(history: any[], question: string) {
+export async function askChatbot(history: any[], question: string, userId: string) {
     try {
-        const result = await askQuestion({ question, history });
+        const result = await askQuestion({ question, history, userId });
         return { advice: result.advice };
     } catch (error) {
         console.error("Error with chatbot:", error);
