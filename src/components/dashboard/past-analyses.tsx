@@ -1,77 +1,56 @@
 'use client';
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { db } from "@/lib/firebase";
 import { AnalysisResult } from "@/lib/types";
-import { collection, query, where, getDocs, orderBy, limit } from "firebase/firestore";
 import { formatDistanceToNow } from "date-fns";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
-import { Skeleton } from "../ui/skeleton";
-import { AlertCircle } from "lucide-react";
+
+const demoAnalyses: AnalysisResult[] = [
+    {
+        id: 'demo-1',
+        userId: 'anonymous-user',
+        imageUrl: 'https://picsum.photos/seed/corn-rust/600/400',
+        analysisResult: 'Common Rust Detected on Corn',
+        confidenceLevel: 0.92,
+        suggestedActions: 'Apply a recommended fungicide. Consider crop rotation for next season. Monitor nearby plants for spread.',
+        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+        additionalDetails: 'Leaves showing small, cinnamon-brown pustules.'
+    },
+    {
+        id: 'demo-2',
+        userId: 'anonymous-user',
+        imageUrl: 'https://picsum.photos/seed/tomato-blight/600/400',
+        analysisResult: 'Early Blight on Tomato Plant',
+        confidenceLevel: 0.88,
+        suggestedActions: 'Prune affected lower leaves. Ensure proper spacing for air circulation. Use a copper-based fungicide if severe.',
+        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+    },
+    {
+        id: 'demo-3',
+        userId: 'anonymous-user',
+        imageUrl: 'https://picsum.photos/seed/healthy-wheat/600/400',
+        analysisResult: 'Healthy Wheat Crop',
+        confidenceLevel: 0.98,
+        suggestedActions: 'Maintain current irrigation and nutrient schedule. Continue to monitor for pests weekly.',
+        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+        additionalDetails: 'Crop appears vibrant and green. No visible signs of stress.'
+    },
+    {
+        id: 'demo-4',
+        userId: 'anonymous-user',
+        imageUrl: 'https://picsum.photos/seed/aphids-lettuce/600/400',
+        analysisResult: 'Aphid Infestation on Lettuce',
+        confidenceLevel: 0.95,
+        suggestedActions: 'Introduce beneficial insects like ladybugs. Apply insecticidal soap or neem oil. Spray with a strong stream of water.',
+        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 1 week ago
+    }
+];
+
 
 export function PastAnalyses() {
-    const [analyses, setAnalyses] = useState<AnalysisResult[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    // Using a mock user ID
-    const userId = "anonymous-user";
-
-    useEffect(() => {
-        const fetchAnalyses = async () => {
-            try {
-                const q = query(
-                    collection(db, "analyses"), 
-                    where("userId", "==", userId),
-                    orderBy("createdAt", "desc"),
-                    limit(12)
-                );
-                const querySnapshot = await getDocs(q);
-                const fetchedAnalyses: AnalysisResult[] = [];
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    fetchedAnalyses.push({
-                        id: doc.id,
-                        ...data,
-                        createdAt: data.createdAt.toDate(),
-                    } as AnalysisResult);
-                });
-                setAnalyses(fetchedAnalyses);
-            } catch (err) {
-                console.error(err);
-                setError("Failed to load past analyses.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchAnalyses();
-    }, [userId]);
-
-    if (loading) {
-        return (
-             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {Array.from({ length: 4 }).map((_, i) => (
-                    <Card key={i} className="overflow-hidden">
-                        <Skeleton className="h-40 w-full" />
-                        <CardHeader>
-                            <Skeleton className="h-6 w-3/4" />
-                        </CardHeader>
-                        <CardFooter>
-                             <Skeleton className="h-4 w-1/2" />
-                        </CardFooter>
-                    </Card>
-                ))}
-            </div>
-        );
-    }
-    
-    if (error) {
-        return <div className="text-destructive flex items-center gap-2"><AlertCircle/> {error}</div>;
-    }
+    const analyses = demoAnalyses;
 
     if (analyses.length === 0) {
         return (
@@ -93,7 +72,7 @@ export function PastAnalyses() {
                         <div className="relative aspect-video">
                             <Image 
                                 src={analysis.imageUrl} 
-                                alt="Analyzed crop" 
+                                alt={analysis.analysisResult}
                                 fill 
                                 className="object-cover"
                                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
