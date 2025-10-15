@@ -3,31 +3,31 @@
     {
       "id": "landing-hero",
       "description": "A drone flying over a lush green agricultural field, representing modern farming technology.",
-      "imageUrl": "https://images.unsplash.com/photo-1601269986382-3c5b8b1b0b0a?q=80&w=1920",
-      "imageHint": "farm drone"
+      "imageUrl": "https://picsum.photos/seed/farm-hero/1920/1080",
+      "imageHint": "farm field"
     },
     {
       "id": "feature-analysis",
       "description": "A person using a magnifying glass to inspect a plant leaf, symbolizing crop analysis.",
-      "imageUrl": "https://images.unsplash.com/photo-1615152528913-74768b53e334?q=80&w=600",
+      "imageUrl": "https://picsum.photos/seed/plant-analysis/600/400",
       "imageHint": "plant inspection"
     },
     {
       "id": "feature-chatbot",
       "description": "A farmer in a field holding a smartphone, representing access to digital advice.",
-      "imageUrl": "https://images.unsplash.com/photo-1560493676-04071c5f467b?q=80&w=600",
+      "imageUrl": "https://picsum.photos/seed/farmer-phone/600/400",
       "imageHint": "farmer smartphone"
     },
     {
       "id": "feature-dashboard",
       "description": "A tablet displaying charts and graphs over a background of a greenhouse.",
-      "imageUrl": "https://images.unsplash.com/photo-1630563443362-b9241a7d6569?q=80&w=600",
-      "imageHint": "farm data"
+      "imageUrl": "https://picsum.photos/seed/farm-dashboard/600/400",
+      "imageHint": "data charts"
     },
     {
       "id": "analysis-placeholder",
       "description": "A placeholder image for a banana plant analysis",
-      "imageUrl": "https://images.unsplash.com/photo-1543363363-67503462612f?q=80&w=300",
+      "imageUrl": "https://picsum.photos/seed/banana-plant/300/200",
       "imageHint": "banana plant"
     }
   ]
