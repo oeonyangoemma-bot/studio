@@ -108,41 +108,6 @@ const chatbotAgriculturalAdviceFlow = ai.defineFlow(
         system: systemPrompt,
     });
     
-    const choice = llmResponse.candidates[0];
-
-    const text = choice.message.content.map(p => {
-      if (p.text) return p.text;
-      if (p.toolRequest) {
-        // Genkit automatically handles tool requests, so we just need to return the response.
-        // The framework will call the tool and then call the flow again with the tool output.
-        // We can return an empty string here as the final response will be generated in the next turn.
-        return '';
-      }
-      return '';
-    }).join('');
-
-    // If the model returns tool calls, the text will be empty.
-    // The flow will be re-run with the tool's output.
-    // If there are no tool calls, we should have a text response.
-    if (text) {
-        return { advice: text };
-    }
-    
-    // If the model's response was a tool call, we need to handle the tool's output
-    // which will come in a subsequent invocation of the flow. For now, we can
-    // check if there are tool results and formulate a response.
-    const toolOutput = llmResponse.candidates[0].message.content.find(p => p.toolResponse);
-    if(toolOutput) {
-         const finalResponse = await ai.generate({
-            prompt: input.question,
-            history: [
-                ...(input.history || []),
-                choice.message
-            ]
-        });
-        return { advice: finalResponse.text() };
-    }
-
-    return { advice: "I'm still processing your request. Please wait a moment." };
+    return { advice: llmResponse.text() };
   }
 );
