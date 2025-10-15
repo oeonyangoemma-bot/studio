@@ -29,14 +29,7 @@ export function ChatbotClient() {
     e.preventDefault();
     if (!input.trim() || isPending) return;
 
-    if (!user) {
-      toast({
-        variant: "destructive",
-        title: "Not Authenticated",
-        description: "You must be logged in to use the chatbot.",
-      });
-      return;
-    }
+    const userId = user?.uid || "anonymous-user";
 
     const userMessage: Message = { role: "user", content: [{ text: input }] };
     const newMessages = [...messages, userMessage];
@@ -44,7 +37,7 @@ export function ChatbotClient() {
     setInput("");
 
     startTransition(async () => {
-      const res = await askChatbot(newMessages, input, user.uid);
+      const res = await askChatbot(newMessages, input, userId);
       let botMessage: Message;
       if (res.error) {
         botMessage = { role: 'model', content: [{ text: res.error }] };

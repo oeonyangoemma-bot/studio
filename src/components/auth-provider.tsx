@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Skeleton } from './ui/skeleton';
+import { usePathname } from 'next/navigation';
 
 interface AuthContextType {
   user: User | null;
@@ -15,6 +16,7 @@ const AuthContext = createContext<AuthContextType>({ user: null, loading: true }
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const pathname = usePathname();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -25,9 +27,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => unsubscribe();
   }, []);
 
+  const isPublicPage = ['/login', '/signup', '/'].includes(pathname);
+  const isChatbotPage = pathname.startsWith('/dashboard/chatbot');
+
+  if(loading && !isPublicPage && !isChatbotPage) {
+    return <AuthLoader />;
+  }
+
   return (
     <AuthContext.Provider value={{ user, loading }}>
-      {loading ? <AuthLoader /> : children}
+      {children}
     </AuthContext.Provider>
   );
 }

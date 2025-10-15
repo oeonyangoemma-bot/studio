@@ -27,7 +27,7 @@ const getAnalysesTool = ai.defineTool(
         const { getDocs, query, collection, where, orderBy, limit } = await import("firebase/firestore");
         const { db } = await import("@/lib/firebase");
         
-        if (!userId) {
+        if (!userId || userId === 'anonymous-user') {
             return [];
         }
 
@@ -91,18 +91,21 @@ const chatbotAgriculturalAdviceFlow = ai.defineFlow(
     outputSchema: ChatbotAgriculturalAdviceOutputSchema,
   },
   async (input) => {
-    const prompt = `You are an AI-powered agricultural advisor. A farmer will ask you a question, and you will provide helpful and practical advice.
+
+    const systemPrompt = input.userId === 'anonymous-user' 
+    ? `You are an AI-powered agricultural advisor. A farmer will ask you a question, and you will provide helpful and practical advice. The user is not logged in, so you cannot access their past analyses.`
+    : `You are an AI-powered agricultural advisor. A farmer will ask you a question, and you will provide helpful and practical advice.
         
     If the user asks about past analyses, use the getAnalyses tool to retrieve the information. You must provide the userId to the tool.
 
-    User ID: ${input.userId}
-    Question: ${input.question}
-    `;
+    User ID: ${input.userId}`;
+
 
     const llmResponse = await ai.generate({
-        prompt: prompt,
+        prompt: input.question,
         history: input.history,
         tools: [getAnalysesTool],
+        system: systemPrompt,
     });
     
     const choice = llmResponse.candidates[0];
@@ -110,13 +113,36 @@ const chatbotAgriculturalAdviceFlow = ai.defineFlow(
     const text = choice.message.content.map(p => {
       if (p.text) return p.text;
       if (p.toolRequest) {
-        // A real app would handle the tool request here.
-        // For this demo, we'll just acknowledge the request.
-        return `I need to use the ${p.toolRequest.name} tool.`;
+        // Genkit automatically handles tool requests, so we just need to return the response.
+        // The framework will call the tool and then call the flow again with the tool output.
+        // We can return an empty string here as the final response will be generated in the next turn.
+        return '';
       }
       return '';
     }).join('');
 
-    return { advice: text };
+    // If the model returns tool calls, the text will be empty.
+    // The flow will be re-run with the tool's output.
+    // If there are no tool calls, we should have a text response.
+    if (text) {
+        return { advice: text };
+    }
+    
+    // If the model's response was a tool call, we need to handle the tool's output
+    // which will come in a subsequent invocation of the flow. For now, we can
+    // check if there are tool results and formulate a response.
+    const toolOutput = llmResponse.candidates[0].message.content.find(p => p.toolResponse);
+    if(toolOutput) {
+         const finalResponse = await ai.generate({
+            prompt: input.question,
+            history: [
+                ...(input.history || []),
+                choice.message
+            ]
+        });
+        return { advice: finalResponse.text() };
+    }
+
+    return { advice: "I'm still processing your request. Please wait a moment." };
   }
 );
