@@ -22,7 +22,11 @@ const ChatbotAgriculturalAdviceOutputSchema = z.object({
 export type ChatbotAgriculturalAdviceOutput = z.infer<typeof ChatbotAgriculturalAdviceOutputSchema>;
 
 export async function askQuestion(input: ChatbotAgriculturalAdviceInput): Promise<ChatbotAgriculturalAdviceOutput> {
-  return chatbotAgriculturalAdviceFlow(input);
+  const { output } = await chatbotAgriculturalAdviceFlow(input);
+  if (!output) {
+    throw new Error('No output from flow');
+  }
+  return output;
 }
 
 const prompt = ai.definePrompt({
@@ -41,7 +45,16 @@ const chatbotAgriculturalAdviceFlow = ai.defineFlow(
     outputSchema: ChatbotAgriculturalAdviceOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    const llmResponse = await ai.generate({
+        prompt: `You are an AI-powered agricultural advisor. A farmer will ask you a question, and you will provide helpful and practical advice.
+
+        Question: ${input.question}`,
+        model: 'googleai/gemini-2.5-flash',
+        output: {
+            schema: ChatbotAgriculturalAdviceOutputSchema,
+        }
+    });
+
+    return llmResponse.output();
   }
 );
