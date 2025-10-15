@@ -1,18 +1,18 @@
 "use client";
 
 import { askChatbot } from "@/app/actions";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { Bot, Send, Sprout, User } from "lucide-react";
+import { Bot, Send, User } from "lucide-react";
 import { FormEvent, useRef, useState, useTransition } from "react";
 import Markdown from "react-markdown";
 
 interface Message {
-  role: "user" | "bot";
-  content: string;
+  role: "user" | "model";
+  content: { text: string }[];
 }
 
 export function ChatbotClient() {
@@ -25,18 +25,18 @@ export function ChatbotClient() {
     e.preventDefault();
     if (!input.trim() || isPending) return;
 
-    const userMessage: Message = { role: "user", content: input };
+    const userMessage: Message = { role: "user", content: [{ text: input }] };
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
     setInput("");
 
     startTransition(async () => {
-      const res = await askChatbot(newMessages.map(m => ({role: m.role, content: m.content})), input);
+      const res = await askChatbot(newMessages, input);
       let botMessage: Message;
       if (res.error) {
-        botMessage = { role: 'bot', content: res.error };
+        botMessage = { role: 'model', content: [{ text: res.error }] };
       } else {
-        botMessage = { role: 'bot', content: res.advice || 'Sorry, something went wrong.' };
+        botMessage = { role: 'model', content: [{ text: res.advice || 'Sorry, something went wrong.' }] };
       }
       setMessages((prev) => [...prev, botMessage]);
       setTimeout(() => {
@@ -59,7 +59,7 @@ export function ChatbotClient() {
                 message.role === "user" ? "justify-end" : ""
               )}
             >
-              {message.role === "bot" && (
+              {message.role === "model" && (
                 <Avatar className="h-8 w-8 border">
                     <AvatarFallback className="bg-primary text-primary-foreground">
                         <Bot />
@@ -75,7 +75,7 @@ export function ChatbotClient() {
                 )}
               >
                 <div className="prose prose-sm max-w-none text-current">
-                  <Markdown>{message.content}</Markdown>
+                  <Markdown>{message.content.map(c => c.text).join('')}</Markdown>
                 </div>
               </div>
               {message.role === "user" && (

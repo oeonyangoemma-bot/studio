@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from 'next/navigation';
-import { Bot, LayoutDashboard, PlusCircle, Sprout } from 'lucide-react';
+import { Bot, LayoutDashboard, PlusCircle } from 'lucide-react';
 
 import {
   Sidebar,
@@ -32,16 +32,16 @@ export function DashboardSidebar() {
       <SidebarMenu className="flex-1 p-2">
         {navItems.map((item) => (
           <SidebarMenuItem key={item.href}>
-            <Link href={item.href} passHref>
-              <SidebarMenuButton
-                isActive={pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))}
-                tooltip={item.label}
-                as="a"
-              >
+            <SidebarMenuButton
+              asChild
+              isActive={pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))}
+              tooltip={item.label}
+            >
+              <Link href={item.href}>
                 {item.icon}
                 <span>{item.label}</span>
-              </SidebarMenuButton>
-            </Link>
+              </Link>
+            </SidebarMenuButton>
           </SidebarMenuItem>
         ))}
       </SidebarMenu>

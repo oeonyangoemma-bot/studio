@@ -10,7 +10,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import { getAnalysisResult } from '@/app/actions';
 import { AnalysisResult } from '@/lib/types';
 
 
@@ -51,7 +50,7 @@ const getAnalysesTool = ai.defineTool(
         if (input.query) {
             return fetchedAnalyses.filter(a => 
                 a.analysisResult.toLowerCase().includes(input.query.toLowerCase()) ||
-                a.additionalDetails?.toLowerCase().includes(input.query.toLowerCase())
+                (a.additionalDetails && a.additionalDetails.toLowerCase().includes(input.query.toLowerCase()))
             );
         }
 
@@ -63,8 +62,10 @@ const getAnalysesTool = ai.defineTool(
 const ChatbotAgriculturalAdviceInputSchema = z.object({
   question: z.string().describe('The agricultural question asked by the farmer.'),
   history: z.array(z.object({
-    role: z.enum(['user', 'bot']),
-    content: z.string(),
+    role: z.enum(['user', 'model']),
+    content: z.array(z.object({
+        text: z.string()
+    }))
   })).optional().describe('The chat history.'),
 });
 export type ChatbotAgriculturalAdviceInput = z.infer<typeof ChatbotAgriculturalAdviceInputSchema>;
@@ -78,28 +79,6 @@ export async function askQuestion(input: ChatbotAgriculturalAdviceInput): Promis
   return chatbotAgriculturalAdviceFlow(input);
 }
 
-const prompt = ai.definePrompt(
-    {
-        name: 'chatbotAgriculturalAdvicePrompt',
-        input: { schema: ChatbotAgriculturalAdviceInputSchema },
-        output: { schema: ChatbotAgriculturalAdviceOutputSchema },
-        tools: [getAnalysesTool],
-        prompt: `You are an AI-powered agricultural advisor. A farmer will ask you a question, and you will provide helpful and practical advice.
-        
-        If the user asks about past analyses, use the getAnalyses tool to retrieve the information.
-
-        Question: {{{question}}}
-        
-        {{#if history}}
-        Chat History:
-        {{#each history}}
-        - {{role}}: {{content}}
-        {{/each}}
-        {{/if}}
-        `
-    }
-);
-
 
 const chatbotAgriculturalAdviceFlow = ai.defineFlow(
   {
@@ -108,11 +87,25 @@ const chatbotAgriculturalAdviceFlow = ai.defineFlow(
     outputSchema: ChatbotAgriculturalAdviceOutputSchema,
   },
   async (input) => {
-    const llmResponse = await prompt(input);
-    const output = llmResponse.output();
-    if (!output) {
-      throw new Error('No output from language model');
-    }
-    return output;
+    const prompt = `You are an AI-powered agricultural advisor. A farmer will ask you a question, and you will provide helpful and practical advice.
+        
+    If the user asks about past analyses, use the getAnalyses tool to retrieve the information.
+
+    Question: ${input.question}
+    `;
+
+    const llmResponse = await ai.generate({
+        prompt: prompt,
+        history: input.history,
+        tools: [getAnalysesTool],
+    });
+    
+    const choice = llmResponse.candidates[0];
+
+    // Note: this is a simple text response.
+    // A more complex implementation could handle tool calls.
+    const text = choice.message.content.map(p => p.text).join('');
+
+    return { advice: text };
   }
 );

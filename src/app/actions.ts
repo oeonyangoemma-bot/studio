@@ -89,10 +89,9 @@ export async function getAnalysisResult(id: string): Promise<AnalysisResult | nu
 }
 
 
-export async function askChatbot(history: {role: string, content: string}[], question: string) {
-    // For simplicity, we only use the last question. A more complex implementation could use the history.
+export async function askChatbot(history: any[], question: string) {
     try {
-        const result = await askQuestion({ question });
+        const result = await askQuestion({ question, history });
         return { advice: result.advice };
     } catch (error) {
         console.error("Error with chatbot:", error);
