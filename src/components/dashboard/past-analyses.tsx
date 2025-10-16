@@ -18,6 +18,9 @@ export function PastAnalyses() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        if (authLoading) {
+            return;
+        }
         if (!user) {
             setLoading(false);
             return;
@@ -65,19 +68,24 @@ export function PastAnalyses() {
 
     if (!user) {
         return (
-             <div className="text-center py-16 border-2 border-dashed rounded-lg">
+             <div className="text-center py-16 border-2 border-dashed rounded-lg col-span-full">
                 <h3 className="text-xl font-semibold">Login to View Past Analyses</h3>
                 <p className="text-muted-foreground mt-2">Create an account to save and review your analysis history.</p>
-                <Button asChild className="mt-4">
-                    <Link href="/signup">Create an Account</Link>
-                </Button>
+                <div className="flex gap-2 justify-center mt-4">
+                    <Button asChild>
+                        <Link href="/signup">Create an Account</Link>
+                    </Button>
+                    <Button asChild variant="secondary">
+                        <Link href="/login">Login</Link>
+                    </Button>
+                </div>
             </div>
         )
     }
 
     if (analyses.length === 0) {
         return (
-            <div className="text-center py-16 border-2 border-dashed rounded-lg">
+            <div className="text-center py-16 border-2 border-dashed rounded-lg col-span-full">
                 <h3 className="text-xl font-semibold">No Analyses Yet</h3>
                 <p className="text-muted-foreground mt-2">Get started by uploading your first crop image.</p>
                 <Button asChild className="mt-4">
@@ -103,6 +111,7 @@ export function PastAnalyses() {
                         </div>
                         <CardHeader className="flex-1">
                             <CardTitle className="text-lg truncate">{analysis.analysisResult}</CardTitle>
+
                         </CardHeader>
                         <CardFooter>
                             <p className="text-sm text-muted-foreground">
