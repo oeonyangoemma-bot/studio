@@ -9,8 +9,6 @@ import { cn } from "@/lib/utils";
 import { Bot, Send, User } from "lucide-react";
 import { FormEvent, useRef, useState, useTransition } from "react";
 import Markdown from "react-markdown";
-import { useAuth } from "../auth-provider";
-import { useToast } from "@/hooks/use-toast";
 
 interface Message {
   role: "user" | "model";
@@ -22,14 +20,10 @@ export function ChatbotClient() {
   const [input, setInput] = useState("");
   const [isPending, startTransition] = useTransition();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const { user } = useAuth();
-  const { toast } = useToast();
 
   const handleSumbit = (e: FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isPending) return;
-
-    const userId = user?.uid || "anonymous-user";
 
     const userMessage: Message = { role: "user", content: [{ text: input }] };
     const newMessages = [...messages, userMessage];
@@ -37,7 +31,7 @@ export function ChatbotClient() {
     setInput("");
 
     startTransition(async () => {
-      const res = await askChatbot(newMessages, input, userId);
+      const res = await askChatbot(newMessages, input);
       let botMessage: Message;
       if (res.error) {
         botMessage = { role: 'model', content: [{ text: res.error }] };

@@ -1,6 +1,6 @@
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { UserNav } from "./user-nav";
-import { AuthProvider } from "./auth-provider";
+import { Button } from "./ui/button";
+import Link from "next/link";
 
 export function Header() {
   return (
@@ -9,10 +9,13 @@ export function Header() {
          <SidebarTrigger />
        </div>
        <div className="flex-1" />
-       <div>
-        <AuthProvider>
-          <UserNav />
-        </AuthProvider>
+       <div className="flex items-center gap-2">
+           <Button asChild variant="ghost">
+              <Link href="#">Login</Link>
+          </Button>
+          <Button asChild>
+              <Link href="#">Sign Up</Link>
+          </Button>
        </div>
     </header>
   )

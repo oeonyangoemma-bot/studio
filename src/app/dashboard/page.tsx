@@ -23,23 +23,7 @@ export default function DashboardPage() {
         </Button>
       </div>
       
-      <Suspense fallback={<PastAnalysesSkeleton />}>
-        <PastAnalyses />
-      </Suspense>
+      <PastAnalyses />
     </div>
   );
-}
-
-function PastAnalysesSkeleton() {
-    return (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="space-y-3">
-                    <Skeleton className="h-40 w-full" />
-                    <Skeleton className="h-6 w-3/4" />
-                    <Skeleton className="h-4 w-1/2" />
-                </div>
-            ))}
-        </div>
-    )
 }

@@ -8,9 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { UploadCloud, Camera, RefreshCcw, SwitchCamera } from "lucide-react";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState, useTransition, useEffect, useRef } from "react";
-import { useAuth } from "../auth-provider";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { AnalysisResult } from "@/lib/types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
@@ -25,10 +24,8 @@ export function AnalysisForm() {
   const [hasCameraPermission, setHasCameraPermission] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
-  const { user } = useAuth();
   
   const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
   const [currentDeviceIndex, setCurrentDeviceIndex] = useState(0);
@@ -158,11 +155,8 @@ export function AnalysisForm() {
       return;
     }
 
-    const userId = user?.uid || 'anonymous-user';
-
     const formData = new FormData(event.currentTarget);
     formData.append('mediaDataUri', dataUri);
-    formData.append('userId', userId);
 
     startTransition(async () => {
       const result = await performAnalysis(formData);
@@ -170,20 +164,14 @@ export function AnalysisForm() {
         toast({
           variant: 'destructive',
           title: 'Analysis Failed',
-          description: typeof result.error === 'string' ? result.error : 'Please check the form and try again.',
+          description: typeof result.error === 'string' ? result.error : 'An unexpected error occurred.',
         });
-      } else if (result.analysisId) {
-        // User is logged in, redirect to saved analysis
-        toast({
-          title: 'Analysis Started',
-          description: 'Your crop image is being analyzed. You will be redirected shortly.',
-        });
-        router.push(`/dashboard/analysis/${result.analysisId}`);
       } else if (result.analysis) {
-        // Anonymous user, show result in a dialog
+        // Always show result in a dialog
         setTempAnalysisResult({
           ...result.analysis,
           id: 'temp-id',
+          userId: 'anonymous-user',
           createdAt: new Date(),
         } as AnalysisResult);
       }
