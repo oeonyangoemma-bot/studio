@@ -12,6 +12,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition, useEffect, useRef } from "react";
 import { useAuth } from "../auth-provider";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { AnalysisResult } from "@/lib/types";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { AnalysisReport } from "./analysis-report";
 
 export function AnalysisForm() {
   const [preview, setPreview] = useState<string | null>(null);
@@ -29,6 +32,8 @@ export function AnalysisForm() {
   
   const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
   const [currentDeviceIndex, setCurrentDeviceIndex] = useState(0);
+
+  const [tempAnalysisResult, setTempAnalysisResult] = useState<AnalysisResult | null>(null);
 
   useEffect(() => {
     const category = searchParams.get('category');
@@ -168,128 +173,155 @@ export function AnalysisForm() {
           description: typeof result.error === 'string' ? result.error : 'Please check the form and try again.',
         });
       } else if (result.analysisId) {
+        // User is logged in, redirect to saved analysis
         toast({
           title: 'Analysis Started',
           description: 'Your crop image is being analyzed. You will be redirected shortly.',
         });
         router.push(`/dashboard/analysis/${result.analysisId}`);
+      } else if (result.analysis) {
+        // Anonymous user, show result in a dialog
+        setTempAnalysisResult({
+          ...result.analysis,
+          id: 'temp-id',
+          createdAt: new Date(),
+        } as AnalysisResult);
       }
     });
   };
 
+  const closeDialog = () => {
+    setTempAnalysisResult(null);
+    resetForm();
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-2">
-        <Label htmlFor="crop-image">Crop Image</Label>
-        
-        {showCamera ? (
-            <div className="w-full h-auto border-2 border-dashed border-muted-foreground/50 rounded-lg flex flex-col items-center justify-center relative overflow-hidden p-4 space-y-4">
-               {!hasCameraPermission ? (
-                     <Alert variant="destructive">
-                       <AlertTitle>Camera Access Denied</AlertTitle>
-                       <AlertDescription>
-                         Please enable camera permissions in your browser settings and try again.
-                       </AlertDescription>
-                     </Alert>
-               ) : (
-                <>
-                  <div className="relative w-full">
-                     <video ref={videoRef} className="w-full aspect-video rounded-md" autoPlay muted playsInline />
-                     {videoDevices.length > 1 && (
-                       <Button 
-                         type="button" 
-                         size="icon" 
-                         variant="secondary"
-                         className="absolute bottom-2 right-2 rounded-full"
-                         onClick={handleSwitchCamera}
-                       >
-                         <SwitchCamera />
-                       </Button>
-                     )}
-                  </div>
-                  <Button type="button" onClick={handleCapture} disabled={isPending}>
-                      <Camera className="mr-2" /> Capture Photo
-                  </Button>
-                </>
-               )}
-            </div>
-        ) : (
-          <div className="w-full h-64 border-2 border-dashed border-muted-foreground/50 rounded-lg flex items-center justify-center relative overflow-hidden">
-            {preview ? (
-              <Image src={preview} alt="Crop preview" fill className="object-contain" />
-            ) : (
-              <div className="text-center text-muted-foreground">
-                <UploadCloud className="mx-auto h-12 w-12" />
-                <p>Click to browse or drag & drop</p>
-                <p className="text-xs">PNG, JPG, WEBP up to 4MB</p>
+    <>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-2">
+          <Label htmlFor="crop-image">Crop Image</Label>
+          
+          {showCamera ? (
+              <div className="w-full h-auto border-2 border-dashed border-muted-foreground/50 rounded-lg flex flex-col items-center justify-center relative overflow-hidden p-4 space-y-4">
+                 {!hasCameraPermission ? (
+                       <Alert variant="destructive">
+                         <AlertTitle>Camera Access Denied</AlertTitle>
+                         <AlertDescription>
+                           Please enable camera permissions in your browser settings and try again.
+                         </AlertDescription>
+                       </Alert>
+                 ) : (
+                  <>
+                    <div className="relative w-full">
+                       <video ref={videoRef} className="w-full aspect-video rounded-md" autoPlay muted playsInline />
+                       {videoDevices.length > 1 && (
+                         <Button 
+                           type="button" 
+                           size="icon" 
+                           variant="secondary"
+                           className="absolute bottom-2 right-2 rounded-full"
+                           onClick={handleSwitchCamera}
+                         >
+                           <SwitchCamera />
+                         </Button>
+                       )}
+                    </div>
+                    <Button type="button" onClick={handleCapture} disabled={isPending}>
+                        <Camera className="mr-2" /> Capture Photo
+                    </Button>
+                  </>
+                 )}
               </div>
-            )}
-            <Input
-              id="crop-image"
-              type="file"
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              onChange={handleFileChange}
-              accept="image/png, image/jpeg, image/webp"
-              disabled={isPending}
-            />
+          ) : (
+            <div className="w-full h-64 border-2 border-dashed border-muted-foreground/50 rounded-lg flex items-center justify-center relative overflow-hidden">
+              {preview ? (
+                <Image src={preview} alt="Crop preview" fill className="object-contain" />
+              ) : (
+                <div className="text-center text-muted-foreground">
+                  <UploadCloud className="mx-auto h-12 w-12" />
+                  <p>Click to browse or drag & drop</p>
+                  <p className="text-xs">PNG, JPG, WEBP up to 4MB</p>
+                </div>
+              )}
+              <Input
+                id="crop-image"
+                type="file"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                onChange={handleFileChange}
+                accept="image/png, image/jpeg, image/webp"
+                disabled={isPending}
+              />
+            </div>
+          )}
+        </div>
+
+        {!preview && !showCamera && (
+           <div className="relative flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">Or</span>
+              </div>
           </div>
         )}
-      </div>
 
-      {!preview && !showCamera && (
-         <div className="relative flex items-center justify-center">
-            <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">Or</span>
-            </div>
+
+        <div className="flex flex-col sm:flex-row gap-2">
+         {!preview && (
+          <Button 
+              type="button" 
+              variant="outline" 
+              className="w-full" 
+              onClick={() => setShowCamera(!showCamera)} 
+              disabled={isPending}
+          >
+              <Camera className="mr-2" /> {showCamera ? 'Close Camera' : 'Use Camera'}
+          </Button>
+         )}
+         {preview && (
+          <Button 
+              type="button" 
+              variant="outline" 
+              className="w-full" 
+              onClick={resetForm} 
+              disabled={isPending}
+          >
+              <RefreshCcw className="mr-2" /> Retake / Re-upload
+          </Button>
+         )}
         </div>
-      )}
+        
+        <canvas ref={canvasRef} className="hidden"></canvas>
 
 
-      <div className="flex flex-col sm:flex-row gap-2">
-       {!preview && (
-        <Button 
-            type="button" 
-            variant="outline" 
-            className="w-full" 
-            onClick={() => setShowCamera(!showCamera)} 
+        <div className="space-y-2">
+          <Label htmlFor="additionalDetails">Additional Details (Optional)</Label>
+          <Textarea
+            id="additionalDetails"
+            name="additionalDetails"
+            placeholder="e.g., 'Corn plant, 2 weeks old, leaves are yellowing'"
+            value={details}
+            onChange={(e) => setDetails(e.target.value)}
             disabled={isPending}
-        >
-            <Camera className="mr-2" /> {showCamera ? 'Close Camera' : 'Use Camera'}
+          />
+        </div>
+
+        <Button type="submit" className="w-full" disabled={isPending || !preview}>
+          {isPending ? "Analyzing..." : "Start Analysis"}
         </Button>
-       )}
-       {preview && (
-        <Button 
-            type="button" 
-            variant="outline" 
-            className="w-full" 
-            onClick={resetForm} 
-            disabled={isPending}
-        >
-            <RefreshCcw className="mr-2" /> Retake / Re-upload
-        </Button>
-       )}
-      </div>
+      </form>
       
-      <canvas ref={canvasRef} className="hidden"></canvas>
-
-
-      <div className="space-y-2">
-        <Label htmlFor="additionalDetails">Additional Details (Optional)</Label>
-        <Textarea
-          id="additionalDetails"
-          name="additionalDetails"
-          placeholder="e.g., 'Corn plant, 2 weeks old, leaves are yellowing'"
-          value={details}
-          onChange={(e) => setDetails(e.target.value)}
-          disabled={isPending}
-        />
-      </div>
-
-      <Button type="submit" className="w-full" disabled={isPending || !preview}>
-        {isPending ? "Analyzing..." : "Start Analysis"}
-      </Button>
-    </form>
+      <Dialog open={!!tempAnalysisResult} onOpenChange={(open) => !open && closeDialog()}>
+        <DialogContent className="max-w-4xl p-0">
+          <DialogHeader className="p-6 pb-0">
+            <DialogTitle>Analysis Result</DialogTitle>
+          </DialogHeader>
+            {tempAnalysisResult && (
+              <AnalysisReport analysis={tempAnalysisResult} />
+            )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
+}

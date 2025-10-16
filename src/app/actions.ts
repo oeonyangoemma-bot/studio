@@ -2,7 +2,7 @@
 
 import { analyzeCropHealth } from "@/ai/flows/ai-analysis-crop-health";
 import { askQuestion } from "@/ai/flows/chatbot-agricultural-advice";
-import { auth, db, storage } from "@/lib/firebase";
+import { db, storage } from "@/lib/firebase";
 import { AnalysisResult } from "@/lib/types";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
@@ -16,6 +16,10 @@ const analysisSchema = z.object({
     additionalDetails: z.string().optional(),
     userId: z.string(),
 });
+
+// We need a temporary result type because we won't have an ID or createdAt for anon users
+type TempAnalysisResult = Omit<AnalysisResult, 'id' | 'createdAt'>;
+
 
 export async function performAnalysis(formData: FormData) {
     const rawData = {
@@ -34,20 +38,27 @@ export async function performAnalysis(formData: FormData) {
     
     const { mediaDataUri, additionalDetails, userId } = validatedFields.data;
     
-    if (!userId) {
-      return { error: "User not authenticated." };
-    }
-    
     try {
-        const [analysisResult, imageUrl] = await Promise.all([
-             analyzeCropHealth({
-                mediaDataUri,
+        const analysisResult = await analyzeCropHealth({
+            mediaDataUri,
+            additionalDetails,
+        });
+
+        // If user is not logged in, just return the result without saving
+        if (userId === 'anonymous-user') {
+            const imageUrl = mediaDataUri; // Use the data URI as a temporary image URL
+            const tempResult: TempAnalysisResult = {
+                userId,
+                imageUrl,
                 additionalDetails,
-            }),
-            uploadImageAndGetUrl(mediaDataUri, userId),
-        ]);
-
-
+                ...analysisResult,
+            };
+            return { analysis: tempResult };
+        }
+        
+        // If user is logged in, save the analysis and image
+        const imageUrl = await uploadImageAndGetUrl(mediaDataUri, userId);
+        
         const docRef = await addDoc(collection(db, "analyses"), {
             userId: userId,
             imageUrl,
