@@ -1,6 +1,5 @@
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { Button } from "./ui/button";
-import Link from "next/link";
+import { UserNav } from "./user-nav";
 
 export function Header() {
   return (
@@ -10,12 +9,7 @@ export function Header() {
        </div>
        <div className="flex-1" />
        <div className="flex items-center gap-2">
-           <Button asChild variant="ghost">
-              <Link href="#">Login</Link>
-          </Button>
-          <Button asChild>
-              <Link href="#">Sign Up</Link>
-          </Button>
+          <UserNav />
        </div>
     </header>
   )
