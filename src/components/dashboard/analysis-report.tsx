@@ -28,9 +28,9 @@ export function AnalysisReport({ analysis }: { analysis: AnalysisResult }) {
     const confidencePercent = Math.round(analysis.confidenceLevel * 100);
 
     return (
-        <Card className="overflow-hidden">
-            <div className="grid md:grid-cols-2">
-                <div className="relative aspect-video md:aspect-square">
+        <Card className="overflow-hidden border-0 shadow-none rounded-none">
+            <div className="flex flex-col">
+                <div className="relative aspect-video">
                     <Image 
                         src={analysis.imageUrl} 
                         alt="Analyzed crop" 
@@ -43,7 +43,7 @@ export function AnalysisReport({ analysis }: { analysis: AnalysisResult }) {
                         <div className="flex items-start gap-4">
                             <div>{getAnalysisIcon(analysis.analysisResult)}</div>
                             <div>
-                                <CardTitle className="text-2xl font-headline mb-1">{analysis.analysisResult}</CardTitle>
+                                <CardTitle className="text-2xl font-headline mb-1 break-words">{analysis.analysisResult}</CardTitle>
                                 <p className="text-sm text-muted-foreground">
                                     Analyzed on {format(new Date(analysis.createdAt), "PPP")}
                                 </p>
@@ -63,7 +63,7 @@ export function AnalysisReport({ analysis }: { analysis: AnalysisResult }) {
                         {analysis.additionalDetails && (
                             <div>
                                 <h3 className="font-semibold mb-2">Your Notes</h3>
-                                <p className="text-sm text-muted-foreground p-3 bg-secondary/50 rounded-md italic">
+                                <p className="text-sm text-muted-foreground p-3 bg-secondary/50 rounded-md italic break-words">
                                     "{analysis.additionalDetails}"
                                 </p>
                             </div>
@@ -71,7 +71,7 @@ export function AnalysisReport({ analysis }: { analysis: AnalysisResult }) {
                         
                         <div>
                              <h3 className="font-semibold mb-2 flex items-center gap-2"><Lightbulb /> Suggested Actions</h3>
-                             <div className="prose prose-sm max-w-none text-foreground bg-secondary/50 p-4 rounded-md">
+                             <div className="prose prose-sm max-w-none text-foreground bg-secondary/50 p-4 rounded-md break-words">
                                 <Markdown>{analysis.suggestedActions}</Markdown>
                              </div>
                         </div>

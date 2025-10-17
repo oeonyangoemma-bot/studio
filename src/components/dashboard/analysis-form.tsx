@@ -14,6 +14,7 @@ import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { AnalysisResult } from "@/lib/types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { AnalysisReport } from "./analysis-report";
+import { ScrollArea } from "../ui/scroll-area";
 
 export function AnalysisForm() {
   const [preview, setPreview] = useState<string | null>(null);
@@ -301,12 +302,14 @@ export function AnalysisForm() {
       </form>
       
       <Dialog open={!!tempAnalysisResult} onOpenChange={(open) => !open && closeDialog()}>
-        <DialogContent className="max-w-4xl p-0">
+        <DialogContent className="p-0 max-w-lg w-full h-[90vh] flex flex-col">
           <DialogHeader className="p-6 pb-0">
             <DialogTitle>Analysis Result</DialogTitle>
           </DialogHeader>
             {tempAnalysisResult && (
-              <AnalysisReport analysis={tempAnalysisResult} />
+              <ScrollArea className="flex-1">
+                <AnalysisReport analysis={tempAnalysisResult} />
+              </ScrollArea>
             )}
         </DialogContent>
       </Dialog>
