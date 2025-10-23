@@ -5,6 +5,9 @@ config(); // Load environment variables from .env file
 
 const nextConfig: NextConfig = {
   /* config options here */
+  serverRuntimeConfig: {
+    geminiApiKey: process.env.GEMINI_API_KEY,
+  },
   typescript: {
     ignoreBuildErrors: true,
   },
